@@ -21,7 +21,6 @@ public class ListaEncadeada<T> {
 
 	public Celula<T> obterCelula(int posicaoCelula) {
 		Celula<T> auxiliar = inicioLista;
-		posicaoCelula--;
 
 		if ((posicaoCelula < 0) || (posicaoCelula > tamanhoLista)) {
 			System.out.println("Posição Inválida");
@@ -42,8 +41,51 @@ public class ListaEncadeada<T> {
 
 	}
 
-	public void adicionarElemento(T elemento) {
+	public boolean adicionarCelula(int posicaoCelula, T elemento) {
+		// testa para ver se a posição digitada é válida
+		if ((posicaoCelula < 0) || (posicaoCelula > tamanhoLista)) {
+			System.out.println("Posição Inválida");
+			return false;
+		}
 
+		// testa para ver se a posição digitada está no começo ou no final da lista
+		if (posicaoCelula == 0) {
+			adicionarInicio(elemento);
+			return true;
+		}
+		if (posicaoCelula == tamanhoLista) {
+			adicionarFinal(elemento);
+			return true;
+		}
+
+		// se a posição estiver no meio
+		Celula<T> novaCelula = new Celula<T>(elemento);
+		Celula<T> antigaCelula = obterCelula(posicaoCelula - 1);
+
+		// troca o valor da proximaCelula para ser o da novaCelula e a
+		// procimaCelula da celula antiga passa a apontar para a novaCelula.
+		novaCelula.setProximaCelula(antigaCelula.getProximaCelula());
+		antigaCelula.setProximaCelula(novaCelula);
+
+		tamanhoLista++;
+		return true;
+
+	}
+
+	public void adicionarInicio(T elemento) {
+		Celula<T> novaCelula = new Celula<T>(elemento);
+
+		if (tamanhoLista == 0) {
+			inicioLista = novaCelula;
+			ultimaCelula = novaCelula;
+		} else {
+			novaCelula.setProximaCelula(inicioLista);
+			inicioLista = novaCelula;
+		}
+		tamanhoLista++;
+	}
+
+	public void adicionarFinal(T elemento) {
 		Celula<T> novaCelula = new Celula<T>(elemento);
 
 		if (tamanhoLista == 0) {
@@ -53,6 +95,66 @@ public class ListaEncadeada<T> {
 		}
 		ultimaCelula = novaCelula;
 		tamanhoLista++;
+	}
+
+	public Celula<T> removerCelula(int posicaoCelula) {
+		// testa para ver se a posição digitada é válida
+		if ((posicaoCelula < 0) || (posicaoCelula > tamanhoLista)) {
+			System.out.println("Posição Inválida");
+			return null;
+		}
+		// testa para ver se a posição digitada está no começo ou no final da lista
+		if (posicaoCelula == 0) {
+			return removerInicio();
+		}
+		if (posicaoCelula == tamanhoLista - 1) {
+			return removerFinal();
+		}
+
+		Celula<T> anteriorCelula = obterCelula(posicaoCelula - 1);
+		Celula<T> atualCelula = anteriorCelula.getProximaCelula();
+
+		anteriorCelula.setProximaCelula(atualCelula.getProximaCelula());
+		atualCelula.setProximaCelula(null);
+		tamanhoLista--;
+		return atualCelula;
+	}
+
+	public Celula<T> removerInicio() {
+		if (tamanhoLista == 0) {
+			return null;
+		}
+		Celula<T> auxiliar = inicioLista;
+		inicioLista = inicioLista.getProximaCelula();
+		auxiliar.setProximaCelula(null);
+		tamanhoLista--;
+		if (tamanhoLista == 0) {
+			ultimaCelula = null;
+		}
+		return auxiliar;
+	}
+
+	public Celula<T> removerFinal() {
+		if (tamanhoLista == 0) {
+			return null;
+		}
+
+		Celula<T> atualCelula = inicioLista;
+		Celula<T> anteriorCelula = inicioLista;
+
+		while (atualCelula.getProximaCelula() != null) {
+			anteriorCelula = atualCelula;
+			atualCelula = atualCelula.getProximaCelula();
+		}
+		ultimaCelula = anteriorCelula;
+		ultimaCelula.setProximaCelula(null);
+		atualCelula = null;
+		tamanhoLista--;
+		if (tamanhoLista == 0) {
+			inicioLista = null;
+			ultimaCelula = null;
+		}
+		return atualCelula;
 
 	}
 
@@ -86,8 +188,6 @@ public class ListaEncadeada<T> {
 		tamanhoLista = 0;
 		ultimaCelula = null;
 		inicioLista = null;
-
-		System.out.println("\nA lista foi esvaziada.");
 
 	}
 }
